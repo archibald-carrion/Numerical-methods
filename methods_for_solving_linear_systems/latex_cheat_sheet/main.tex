@@ -1,0 +1,387 @@
+\documentclass{article}
+\usepackage{graphicx} % Required for inserting images
+\usepackage{amsmath} % For advanced math formatting
+\usepackage{algorithm} % For algorithm environment
+\usepackage{algpseudocode} % For algorithmic environment
+\usepackage{amssymb} % For mathematical symbols
+\usepackage{hyperref} % For hyperlinks
+
+\title{Numerical Methods for Linear Equation Systems}
+\author{archibald.carrion}
+\date{May 2025}
+
+\begin{document}
+
+\maketitle
+
+\tableofcontents
+
+\section{Basic Notation}
+
+\begin{align}
+A\mathbf{x} &= \mathbf{b}\\
+\begin{pmatrix}
+a_{11} & a_{12} & \cdots & a_{1n} \\
+a_{21} & a_{22} & \cdots & a_{2n} \\
+\vdots & \vdots & \ddots & \vdots \\
+a_{m1} & a_{m2} & \cdots & a_{mn}
+\end{pmatrix}
+\begin{pmatrix}
+x_1 \\
+x_2 \\
+\vdots \\
+x_n
+\end{pmatrix} &= 
+\begin{pmatrix}
+b_1 \\
+b_2 \\
+\vdots \\
+b_m
+\end{pmatrix}
+\end{align}
+
+\section{Direct Methods}
+
+\subsection{Gaussian Elimination}
+
+\begin{algorithm}
+\caption{Gaussian Elimination with Back Substitution}
+\begin{algorithmic}[1]
+\State \textbf{Forward Elimination:}
+\For{$k = 1$ to $n-1$}
+    \For{$i = k+1$ to $n$}
+        \State $m_{ik} \gets a_{ik}/a_{kk}$
+        \State $a_{ik} \gets 0$
+        \For{$j = k+1$ to $n$}
+            \State $a_{ij} \gets a_{ij} - m_{ik}a_{kj}$
+        \EndFor
+        \State $b_i \gets b_i - m_{ik}b_k$
+    \EndFor
+\EndFor
+\State \textbf{Back Substitution:}
+\State $x_n \gets b_n/a_{nn}$
+\For{$i = n-1$ down to $1$}
+    \State $s \gets 0$
+    \For{$j = i+1$ to $n$}
+        \State $s \gets s + a_{ij}x_j$
+    \EndFor
+    \State $x_i \gets (b_i - s)/a_{ii}$
+\EndFor
+\end{algorithmic}
+\end{algorithm}
+
+Matrix form:
+\begin{equation}
+A = \begin{pmatrix}
+a_{11} & a_{12} & a_{13} \\
+a_{21} & a_{22} & a_{23} \\
+a_{31} & a_{32} & a_{33}
+\end{pmatrix} \xrightarrow[\text{operations}]{\text{elementary row}} 
+\begin{pmatrix}
+a_{11} & a_{12} & a_{13} \\
+0 & a_{22}' & a_{23}' \\
+0 & 0 & a_{33}'
+\end{pmatrix}
+\end{equation}
+
+\subsection{LU Decomposition}
+
+\begin{equation}
+A = LU = 
+\begin{pmatrix}
+l_{11} & 0 & \cdots & 0 \\
+l_{21} & l_{22} & \cdots & 0 \\
+\vdots & \vdots & \ddots & \vdots \\
+l_{n1} & l_{n2} & \cdots & l_{nn}
+\end{pmatrix}
+\begin{pmatrix}
+u_{11} & u_{12} & \cdots & u_{1n} \\
+0 & u_{22} & \cdots & u_{2n} \\
+\vdots & \vdots & \ddots & \vdots \\
+0 & 0 & \cdots & u_{nn}
+\end{pmatrix}
+\end{equation}
+
+Algorithm:
+\begin{algorithm}
+\caption{LU Decomposition (Doolittle's method)}
+\begin{algorithmic}[1]
+\For{$i = 1$ to $n$}
+    \For{$j = i$ to $n$}
+        \State $u_{ij} \gets a_{ij} - \sum_{k=1}^{i-1} l_{ik}u_{kj}$
+    \EndFor
+    \For{$j = i+1$ to $n$}
+        \State $l_{ji} \gets \frac{1}{u_{ii}} \left(a_{ji} - \sum_{k=1}^{i-1} l_{jk}u_{ki}\right)$
+    \EndFor
+    \State $l_{ii} \gets 1$
+\EndFor
+\end{algorithmic}
+\end{algorithm}
+
+Solving $A\mathbf{x} = \mathbf{b}$ using LU:
+\begin{aligned}
+A\mathbf{x} &= \mathbf{b} \\
+LU\mathbf{x} &= \mathbf{b}
+\end{aligned}
+
+% Step 1: Solve Ly = b for y
+\begin{aligned}
+L\mathbf{y} &= \mathbf{b} \\
+y_1 &= b_1 \\
+y_i &= b_i - \sum_{j=1}^{i-1} l_{ij}y_j \quad \text{for } i = 2, \ldots, n
+\end{aligned}
+
+% Step 2: Solve Ux = y for x
+\begin{aligned}
+U\mathbf{x} &= \mathbf{y} \\
+x_n &= \frac{y_n}{u_{nn}} \\
+x_i &= \frac{1}{u_{ii}} \left(y_i - \sum_{j=i+1}^{n} u_{ij}x_j \right) \quad \text{for } i = n-1, \ldots, 1
+\end{aligned}
+
+\subsection{Cholesky Decomposition}
+
+For symmetric positive definite matrices:
+
+\begin{equation}
+A = LL^T = 
+\begin{pmatrix}
+l_{11} & 0 & \cdots & 0 \\
+l_{21} & l_{22} & \cdots & 0 \\
+\vdots & \vdots & \ddots & \vdots \\
+l_{n1} & l_{n2} & \cdots & l_{nn}
+\end{pmatrix}
+\begin{pmatrix}
+l_{11} & l_{21} & \cdots & l_{n1} \\
+0 & l_{22} & \cdots & l_{n2} \\
+\vdots & \vdots & \ddots & \vdots \\
+0 & 0 & \cdots & l_{nn}
+\end{pmatrix}
+\end{equation}
+
+Algorithm:
+\begin{algorithm}
+\caption{Cholesky Decomposition}
+\begin{algorithmic}[1]
+\For{$i = 1$ to $n$}
+    \State $l_{ii} \gets \sqrt{a_{ii} - \sum_{k=1}^{i-1} l_{ik}^2}$
+    \For{$j = i+1$ to $n$}
+        \State $l_{ji} \gets \frac{1}{l_{ii}} \left(a_{ji} - \sum_{k=1}^{i-1} l_{jk}l_{ik}\right)$
+    \EndFor
+\EndFor
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{QR Decomposition}
+
+\begin{equation}
+A = QR = 
+\begin{pmatrix}
+\mathbf{q}_1 & \mathbf{q}_2 & \cdots & \mathbf{q}_n
+\end{pmatrix}
+\begin{pmatrix}
+r_{11} & r_{12} & \cdots & r_{1n} \\
+0 & r_{22} & \cdots & r_{2n} \\
+\vdots & \vdots & \ddots & \vdots \\
+0 & 0 & \cdots & r_{nn}
+\end{pmatrix}
+\end{equation}
+
+Gram-Schmidt Process:
+\begin{algorithm}
+\caption{QR Decomposition via Gram-Schmidt}
+\begin{algorithmic}[1]
+\For{$j = 1$ to $n$}
+    \State $\mathbf{v}_j \gets \mathbf{a}_j$
+    \For{$i = 1$ to $j-1$}
+        \State $r_{ij} \gets \mathbf{q}_i^T \mathbf{a}_j$
+        \State $\mathbf{v}_j \gets \mathbf{v}_j - r_{ij}\mathbf{q}_i$
+    \EndFor
+    \State $r_{jj} \gets \|\mathbf{v}_j\|_2$
+    \State $\mathbf{q}_j \gets \mathbf{v}_j / r_{jj}$
+\EndFor
+\end{algorithmic}
+\end{algorithm}
+
+Householder reflections:
+\begin{aligned}
+\text{Householder matrix: } H_k &= I - 2\mathbf{u}_k\mathbf{u}_k^T \\
+\mathbf{u}_k &= \frac{\mathbf{v}_k}{\|\mathbf{v}_k\|_2} \\
+\mathbf{v}_k &= \mathbf{a}_k + \text{sign}(a_{kk})\|\mathbf{a}_k\|_2 \mathbf{e}_1
+\end{aligned}
+
+\section{Iterative Methods}
+
+\subsection{Jacobi Method}
+
+\begin{aligned}
+A &= D + L + U \quad \text{(Diagonal + Lower + Upper)}\\
+x_i^{(k+1)} &= \frac{1}{a_{ii}} \left(b_i - \sum_{j=1,j\neq i}^{n} a_{ij}x_j^{(k)}\right) \\
+\mathbf{x}^{(k+1)} &= D^{-1}(\mathbf{b} - (L+U)\mathbf{x}^{(k)})
+\end{aligned}
+
+Algorithm:
+\begin{algorithm}
+\caption{Jacobi Method}
+\begin{algorithmic}[1]
+\State Choose initial guess $\mathbf{x}^{(0)}$
+\State Set convergence tolerance $\varepsilon$
+\State $k \gets 0$
+\Repeat
+    \For{$i = 1$ to $n$}
+        \State $x_i^{(k+1)} \gets \frac{1}{a_{ii}} \left(b_i - \sum_{j=1,j\neq i}^{n} a_{ij}x_j^{(k)}\right)$
+    \EndFor
+    \State $k \gets k + 1$
+\Until{$\|\mathbf{x}^{(k)} - \mathbf{x}^{(k-1)}\|_2 < \varepsilon$}
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Gauss-Seidel Method}
+
+\begin{aligned}
+x_i^{(k+1)} &= \frac{1}{a_{ii}} \left(b_i - \sum_{j=1}^{i-1} a_{ij}x_j^{(k+1)} - \sum_{j=i+1}^{n} a_{ij}x_j^{(k)}\right) \\
+\mathbf{x}^{(k+1)} &= (D+L)^{-1}(\mathbf{b} - U\mathbf{x}^{(k)})
+\end{aligned}
+
+Algorithm:
+\begin{algorithm}
+\caption{Gauss-Seidel Method}
+\begin{algorithmic}[1]
+\State Choose initial guess $\mathbf{x}^{(0)}$
+\State Set convergence tolerance $\varepsilon$
+\State $k \gets 0$
+\Repeat
+    \For{$i = 1$ to $n$}
+        \State $x_i^{(k+1)} \gets \frac{1}{a_{ii}} \left(b_i - \sum_{j=1}^{i-1} a_{ij}x_j^{(k+1)} - \sum_{j=i+1}^{n} a_{ij}x_j^{(k)}\right)$
+    \EndFor
+    \State $k \gets k + 1$
+\Until{$\|\mathbf{x}^{(k)} - \mathbf{x}^{(k-1)}\|_2 < \varepsilon$}
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Successive Over-Relaxation}
+
+\begin{aligned}
+x_i^{(k+1)} &= (1-\omega)x_i^{(k)} + \frac{\omega}{a_{ii}} \left(b_i - \sum_{j=1}^{i-1} a_{ij}x_j^{(k+1)} - \sum_{j=i+1}^{n} a_{ij}x_j^{(k)}\right) \\
+\mathbf{x}^{(k+1)} &= (D+\omega L)^{-1}((1-\omega)D - \omega U)\mathbf{x}^{(k)} + \omega(D+\omega L)^{-1}\mathbf{b}
+\end{aligned}
+
+Algorithm:
+\begin{algorithm}
+\caption{Successive Over-Relaxation Method}
+\begin{algorithmic}[1]
+\State Choose initial guess $\mathbf{x}^{(0)}$
+\State Set relaxation parameter $\omega \in (0,2)$
+\State Set convergence tolerance $\varepsilon$
+\State $k \gets 0$
+\Repeat
+    \For{$i = 1$ to $n$}
+        \State $x_i^{(k+1)} \gets (1-\omega)x_i^{(k)} + \frac{\omega}{a_{ii}} \left(b_i - \sum_{j=1}^{i-1} a_{ij}x_j^{(k+1)} - \sum_{j=i+1}^{n} a_{ij}x_j^{(k)}\right)$
+    \EndFor
+    \State $k \gets k + 1$
+\Until{$\|\mathbf{x}^{(k)} - \mathbf{x}^{(k-1)}\|_2 < \varepsilon$}
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Conjugate Gradient Method}
+
+For symmetric positive definite matrices:
+
+\begin{algorithm}
+\caption{Conjugate Gradient Method}
+\begin{algorithmic}[1]
+\State Choose initial guess $\mathbf{x}^{(0)}$
+\State $\mathbf{r}^{(0)} \gets \mathbf{b} - A\mathbf{x}^{(0)}$
+\State $\mathbf{p}^{(0)} \gets \mathbf{r}^{(0)}$
+\For{$k = 0,1,2,\ldots$ until convergence}
+    \State $\alpha_k \gets \frac{\mathbf{r}^{(k)T}\mathbf{r}^{(k)}}{\mathbf{p}^{(k)T}A\mathbf{p}^{(k)}}$
+    \State $\mathbf{x}^{(k+1)} \gets \mathbf{x}^{(k)} + \alpha_k\mathbf{p}^{(k)}$
+    \State $\mathbf{r}^{(k+1)} \gets \mathbf{r}^{(k)} - \alpha_k A\mathbf{p}^{(k)}$
+    \State $\beta_k \gets \frac{\mathbf{r}^{(k+1)T}\mathbf{r}^{(k+1)}}{\mathbf{r}^{(k)T}\mathbf{r}^{(k)}}$
+    \State $\mathbf{p}^{(k+1)} \gets \mathbf{r}^{(k+1)} + \beta_k\mathbf{p}^{(k)}$
+\EndFor
+\end{algorithmic}
+\end{algorithm}
+
+\section{Special Cases}
+
+\subsection{Tridiagonal Systems}
+
+\begin{equation}
+A = 
+\begin{pmatrix}
+b_1 & c_1 & 0 & \cdots & 0 \\
+a_2 & b_2 & c_2 & \cdots & 0 \\
+0 & a_3 & b_3 & \cdots & 0 \\
+\vdots & \vdots & \vdots & \ddots & \vdots \\
+0 & 0 & 0 & a_n & b_n
+\end{pmatrix}
+\end{equation}
+
+Thomas Algorithm:
+\begin{algorithm}
+\caption{Thomas Algorithm (Tridiagonal Matrix Algorithm)}
+\begin{algorithmic}[1]
+\State \textbf{Forward Sweep:}
+\State $c_1' \gets \frac{c_1}{b_1}$
+\State $d_1' \gets \frac{d_1}{b_1}$
+\For{$i = 2$ to $n$}
+    \State $c_i' \gets \frac{c_i}{b_i - a_i c_{i-1}'}$
+    \State $d_i' \gets \frac{d_i - a_i d_{i-1}'}{b_i - a_i c_{i-1}'}$
+\EndFor
+\State \textbf{Back Substitution:}
+\State $x_n \gets d_n'$
+\For{$i = n-1$ down to $1$}
+    \State $x_i \gets d_i' - c_i' x_{i+1}$
+\EndFor
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Sparse Systems}
+
+\begin{aligned}
+\text{values} &= [a_{11}, a_{12}, \ldots, a_{mn}] \quad \text{(non-zero elements)} \\
+\text{col\_indices} &= [j_1, j_2, \ldots, j_{nnz}] \quad \text{(column indices)} \\
+\text{row\_ptr} &= [0, p_1, p_2, \ldots, p_m] \quad \text{(pointers to row starts)}
+\end{aligned}
+
+\section{Error Analysis}
+
+\begin{aligned}
+\text{True error: } \mathbf{e} &= \mathbf{x} - \mathbf{\tilde{x}} \\
+\text{Residual: } \mathbf{r} &= \mathbf{b} - A\mathbf{\tilde{x}} \\
+\text{Relationship: } A\mathbf{e} &= \mathbf{r}
+\end{aligned}
+
+Condition Number:
+\begin{equation}
+\kappa(A) = \|A\| \cdot \|A^{-1}\| = \frac{\sigma_{\max}}{\sigma_{\min}}
+\end{equation}
+
+Error Bounds:
+\begin{aligned}
+\frac{\|\mathbf{e}\|}{\|\mathbf{x}\|} &\leq \kappa(A) \left( \frac{\|\mathbf{r}\|}{\|\mathbf{b}\|} \right) \\
+\frac{\|\mathbf{e}\|}{\|\mathbf{x}\|} &\leq \frac{\kappa(A)}{1 - \kappa(A)\varepsilon} \left( \frac{\|\Delta A\|}{\|A\|} + \frac{\|\Delta \mathbf{b}\|}{\|\mathbf{b}\|} \right)
+\end{aligned}
+
+\section{Convergence Criteria}
+
+\begin{aligned}
+\text{Absolute Error: } \|\mathbf{x}^{(k+1)} - \mathbf{x}^{(k)}\| &< \varepsilon_{\text{abs}} \\
+\text{Relative Error: } \frac{\|\mathbf{x}^{(k+1)} - \mathbf{x}^{(k)}\|}{\|\mathbf{x}^{(k+1)}\|} &< \varepsilon_{\text{rel}} \\
+\text{Residual: } \|\mathbf{b} - A\mathbf{x}^{(k)}\| &< \varepsilon_{\text{res}} \\
+\text{Normalized Residual: } \frac{\|\mathbf{b} - A\mathbf{x}^{(k)}\|}{\|\mathbf{b}\|} &< \varepsilon_{\text{nres}}
+\end{aligned}
+
+Convergence Conditions:
+\begin{aligned}
+\text{Jacobi: } \rho(D^{-1}(L+U)) &< 1 \\
+\text{Gauss-Seidel: } \rho((D+L)^{-1}U) &< 1 \\
+\text{SOR: } \rho((D+\omega L)^{-1}((1-\omega)D - \omega U)) &< 1
+\end{aligned}
+
+For diagonally dominant matrices:
+\begin{equation}
+|a_{ii}| > \sum_{j=1,j\neq i}^{n} |a_{ij}| \quad \text{for all } i = 1,2,\ldots,n
+\end{equation}
+
+\end{document}
