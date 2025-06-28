@@ -91,4 +91,7 @@ Clone the repository:
 git clone https://github.com/archibald-carrion/Numerical-methods.git
 cd Numerical-methods
 ```
+
 Once downloaded, you can navigate to the specific method's directory and run the corresponding script, note that the project use a variety of languages, so you may need to install the required dependencies for each method, each method has its own README file with instructions on how to run it.
+
+If you wish to run GNU Octave or MATLAB scripts, ensure you have the respective software installed, you can follow the [GNU Octave installation guide](https://github.com/archibald-carrion/Numerical-methods/doc/gnu_octave_instalation.md) to do so.
