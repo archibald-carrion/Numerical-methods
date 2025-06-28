@@ -61,6 +61,8 @@ Simpson's rule is a more sophisticated method that approximates the function wit
       * The error is proportional to $\\frac{1}{n^4}$, making it converge much faster.
       * Requires a specific number of subintervals (even for 1/3 rule, multiple of 3 for 3/8 rule).
 
+![Simpson's Rule Example](./simpsons_rule/integration_plot.png)
+
 ### 4\. [Gaussian Quadrature](./gaussian_quadrature/)
 
 Gaussian quadrature is a powerful and highly accurate method. Unlike the previous methods that use equally spaced points, Gaussian quadrature strategically chooses specific points (known as abscissas or nodes) and weights to evaluate the function. These points are chosen to provide the most accurate result for a polynomial of a given degree.
@@ -74,3 +76,5 @@ Gaussian quadrature is a powerful and highly accurate method. Unlike the previou
       * The nodes and weights are pre-calculated and are dependent on the number of points used.
       * More complex to implement than the simpler methods.
       * Can exactly integrate a polynomial of degree up to $2n-1$ using $n$ nodes.
+
+![Gaussian Quadrature Example](./gaussian_quadrature/integration_plot.png)
