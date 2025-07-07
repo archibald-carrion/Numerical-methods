@@ -78,3 +78,5 @@ Gaussian quadrature is a powerful and highly accurate method. Unlike the previou
       * Can exactly integrate a polynomial of degree up to $2n-1$ using $n$ nodes.
 
 ![Gaussian Quadrature Example](./gaussian_quadrature/integration_plot.png)
+
+For more details on Gaussian quadrature, see the [Gauss-Legendre Values](./gauss_legendre_values/) section.
